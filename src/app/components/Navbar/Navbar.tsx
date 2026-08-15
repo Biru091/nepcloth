@@ -15,7 +15,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="pointer-events-auto absolute left-0 top-0 z-[100] w-full bg-transparent  text-black">
+    <header className="pointer-events-auto fixed left-0 top-0 z-[100] w-full  bg-white text-black">
       <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-7 md:px-6">
 
         {/* Logo */}
@@ -159,8 +159,11 @@ export default function Navbar() {
               Wishlist
             </Link>
           </div>
+          
         </div>
+        
       )}
+      <div className="h-10"></div>
     </header>
   );
 }
