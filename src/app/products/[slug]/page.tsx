@@ -195,7 +195,7 @@ export default function ProductPage() {
                                             } border-black/15 py-3 text-sm transition-colors  hover:border-black hover:bg-black hover:text-white`}
                                         onClick={() => {
                                             setSelectedSize(size)
-                                            
+
                                         }
                                         }
                                     >
@@ -225,13 +225,27 @@ export default function ProductPage() {
                         >
                             Add to Cart
                         </button>
+                        
 
-                        <button
-                            type="button"
-                            className="mt-3 w-full border border-black py-4 text-sm font-medium uppercase tracking-wider transition-colors hover:bg-black hover:text-white"
-                        >
-                            Buy Now
-                        </button>
+                            <button
+                                type="button"
+                                className="mt-3 w-full border border-black py-4 text-sm font-medium uppercase tracking-wider transition-colors hover:bg-black hover:text-white"
+                                onClick={() => {
+                                if (!selectedSize) {
+                                    alert("Please select a size");
+                                    return;
+                                }
+
+                                addToCart(product.id, selectedSize);
+                                router.push("/buy");
+
+                            }}
+
+                            >
+                                Buy Now
+                            </button>
+
+
 
                     </div>
 
