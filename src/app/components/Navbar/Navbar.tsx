@@ -163,7 +163,6 @@ export default function Navbar() {
         </div>
         
       )}
-      <div className="h-10"></div>
     </header>
   );
 }
