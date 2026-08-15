@@ -1,6 +1,6 @@
 import Link from "next/link";
 import products from "@/app/data/products.json"
-import ProductCard from "../../ProductCard/page";
+import ProductCard from "../../ProductCard/ProductCard";
 import { Product } from "@/app/types/products";
 
 export default function Trending() {

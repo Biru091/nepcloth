@@ -1,5 +1,5 @@
 import productsData from "@/app/data/products.json"
-import ProductCard from "@/app/components/ProductCard/page";
+import ProductCard from "@/app/components/ProductCard/ProductCard";
 import { Product } from "@/app/types/products";
 
 export default function NewArrivalsPage() {
