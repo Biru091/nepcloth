@@ -4,12 +4,11 @@ import Link from "next/link";
 import { Product } from "@/app/types/products";
 interface ProductCardProps {
   product: Product;
-  image?: string;
+ 
 }
 
 export default function ProductCard({
   product,
-  image = "/products/demo-tshirt.jpg",
 }: ProductCardProps) {
   return (
     <Link

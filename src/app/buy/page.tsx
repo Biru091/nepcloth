@@ -175,6 +175,7 @@ export default function BuyPage() {
                     type="tel"
                     placeholder="98XXXXXXXX"
                     className="mt-2 w-full border border-black/15 px-4 py-3 text-sm outline-none focus:border-black"
+                    required
                   />
 
                 </div>
@@ -189,6 +190,7 @@ export default function BuyPage() {
                     type="text"
                     placeholder="Street / Tole"
                     className="mt-2 w-full border border-black/15 px-4 py-3 text-sm outline-none focus:border-black"
+                    required
                   />
 
                 </div>
