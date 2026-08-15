@@ -15,8 +15,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="pointer-events-auto fixed left-0 top-0 z-[100] w-full  bg-white text-black">
-      <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-7 md:px-6">
+    <header className="pointer-events-auto fixed left-0 top-0 z-[100] w-full   text-black">
+      <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between bg-white px-7 md:px-6">
 
         {/* Logo */}
         <Link

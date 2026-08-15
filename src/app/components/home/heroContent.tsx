@@ -1,4 +1,6 @@
+import Link from "next/link";
 export default function HeroContent() {
+  
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 text-center">
 
@@ -20,19 +22,19 @@ export default function HeroContent() {
 
         <div className="pointer-events-auto mt-8 flex items-center gap-3">
 
-          <a
+          <Link
             href="/products"
             className="rounded-full bg-black px-7 py-3 text-sm font-medium text-white transition-transform duration-300 hover:scale-105"
           >
             Explore Collection
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/category/new-arrivals"
             className="rounded-full border border-black/20 bg-white/40 px-7 py-3 text-sm font-medium text-black backdrop-blur-sm transition-colors duration-300 hover:bg-black hover:text-white"
           >
             New Arrivals
-          </a>
+          </Link>
 
         </div>
 
