@@ -10,13 +10,13 @@ export default function HeroContent() {
           NEPCLOTH
         </p>
 
-        <h1 className="max-w-4xl text-5xl font-medium leading-[0.95] tracking-[-0.04em] text-black sm:text-6xl md:text-7xl lg:text-8xl">
+        <h1 className="max-w-4xl text-5xl font-medium leading-[0.95] tracking-[-0.04em] text-red-900 sm:text-6xl md:text-7xl lg:text-8xl">
           Wear Y
-          <span className="text-black">o</span>
+          <span className="text-red">o</span>
           ur Identity
         </h1>
 
-        <p className="mt-6 max-w-md text-sm leading-6  sm:text-base">
+        <p className="mt-6 max-w-md text-sm leading-6  sm:text-base text-white">
           Contemporary pieces designed to express who you are.
         </p>
 

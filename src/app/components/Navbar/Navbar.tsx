@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { UserRoundKey } from 'lucide-react';
+
 import {
   Search,
   Heart,
@@ -61,6 +63,7 @@ export default function Navbar() {
           >
             Trending
           </Link>
+
         </div>
 
         {/* Desktop Actions */}
@@ -87,6 +90,15 @@ export default function Navbar() {
             className="transition-opacity hover:opacity-60"
           >
             <ShoppingBag size={20} strokeWidth={1.8} />
+          </Link>
+          <Link
+            href="/auth"
+            aria-label="Login-Reg"
+            className="transition-opacity hover:opacity-60"
+            
+          >
+            <UserRoundKey
+              size={20} strokeWidth={1.8} />
           </Link>
         </div>
 
@@ -159,9 +171,9 @@ export default function Navbar() {
               Wishlist
             </Link>
           </div>
-          
+
         </div>
-        
+
       )}
     </header>
   );
