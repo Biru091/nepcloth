@@ -14,6 +14,7 @@ export interface CartItem {
 }
 
 interface CartContextType {
+  // Cart
   cart: CartItem[];
 
   addToCart: (
@@ -34,34 +35,44 @@ interface CartContextType {
   ) => void;
 
   clearCart: () => void;
+
+  // Wishlist
+  wishlist: string[];
+
+  addToWishlist: (
+    productId: string
+  ) => void;
+
+  removeFromWishlist: (
+    productId: string
+  ) => void;
+
+  isInWishlist: (
+    productId: string
+  ) => boolean;
+
+  clearWishlist: () => void;
 }
 
-const CartContext = createContext<CartContextType | undefined>(
-  undefined
-);
+const CartContext =
+  createContext<CartContextType | undefined>(
+    undefined
+  );
 
 export function CartProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
+  const [cart, setCart] =
+    useState<CartItem[]>([]);
 
-    const savedCart = localStorage.getItem("cart");
+  const [wishlist, setWishlist] =
+    useState<string[]>([]);
 
-    if (!savedCart) {
-      return [];
-    }
-
-    try {
-      return JSON.parse(savedCart);
-    } catch {
-      return [];
-    }
-  });
+  // =========================
+  // CART
+  // =========================
 
   const addToCart = (
     productId: string,
@@ -69,23 +80,26 @@ export function CartProvider({
     quantity = 1
   ) => {
     setCart((currentCart) => {
-      const existingItem = currentCart.find(
-        (item) =>
-          item.productId === productId &&
-          item.size === size
-      );
+      const existingItem =
+        currentCart.find(
+          (item) =>
+            item.productId === productId &&
+            item.size === size
+        );
 
       let updatedCart: CartItem[];
 
       if (existingItem) {
-        updatedCart = currentCart.map((item) =>
-          item.productId === productId &&
-          item.size === size
-            ? {
-                ...item,
-                quantity: item.quantity + quantity,
-              }
-            : item
+        updatedCart = currentCart.map(
+          (item) =>
+            item.productId === productId &&
+            item.size === size
+              ? {
+                  ...item,
+                  quantity:
+                    item.quantity + quantity,
+                }
+              : item
         );
       } else {
         updatedCart = [
@@ -98,10 +112,12 @@ export function CartProvider({
         ];
       }
 
-      localStorage.setItem(
-        "cart",
-        JSON.stringify(updatedCart)
-      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "cart",
+          JSON.stringify(updatedCart)
+        );
+      }
 
       return updatedCart;
     });
@@ -112,18 +128,21 @@ export function CartProvider({
     size: string
   ) => {
     setCart((currentCart) => {
-      const updatedCart = currentCart.filter(
-        (item) =>
-          !(
-            item.productId === productId &&
-            item.size === size
-          )
-      );
+      const updatedCart =
+        currentCart.filter(
+          (item) =>
+            !(
+              item.productId === productId &&
+              item.size === size
+            )
+        );
 
-      localStorage.setItem(
-        "cart",
-        JSON.stringify(updatedCart)
-      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "cart",
+          JSON.stringify(updatedCart)
+        );
+      }
 
       return updatedCart;
     });
@@ -135,25 +154,31 @@ export function CartProvider({
     quantity: number
   ) => {
     if (quantity <= 0) {
-      removeFromCart(productId, size);
+      removeFromCart(
+        productId,
+        size
+      );
       return;
     }
 
     setCart((currentCart) => {
-      const updatedCart = currentCart.map((item) =>
-        item.productId === productId &&
-        item.size === size
-          ? {
-              ...item,
-              quantity,
-            }
-          : item
-      );
+      const updatedCart =
+        currentCart.map((item) =>
+          item.productId === productId &&
+          item.size === size
+            ? {
+                ...item,
+                quantity,
+              }
+            : item
+        );
 
-      localStorage.setItem(
-        "cart",
-        JSON.stringify(updatedCart)
-      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "cart",
+          JSON.stringify(updatedCart)
+        );
+      }
 
       return updatedCart;
     });
@@ -162,17 +187,100 @@ export function CartProvider({
   const clearCart = () => {
     setCart([]);
 
-    localStorage.removeItem("cart");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cart");
+    }
   };
+
+  // =========================
+  // WISHLIST
+  // =========================
+
+  const addToWishlist = (
+    productId: string
+  ) => {
+    setWishlist((currentWishlist) => {
+      // Prevent duplicate
+      if (
+        currentWishlist.includes(
+          productId
+        )
+      ) {
+        return currentWishlist;
+      }
+
+      const updatedWishlist = [
+        ...currentWishlist,
+        productId,
+      ];
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "wishlist",
+          JSON.stringify(updatedWishlist)
+        );
+      }
+
+      return updatedWishlist;
+    });
+  };
+
+  const removeFromWishlist = (
+    productId: string
+  ) => {
+    setWishlist((currentWishlist) => {
+      const updatedWishlist =
+        currentWishlist.filter(
+          (id) => id !== productId
+        );
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "wishlist",
+          JSON.stringify(updatedWishlist)
+        );
+      }
+
+      return updatedWishlist;
+    });
+  };
+
+  const isInWishlist = (
+    productId: string
+  ) => {
+    return wishlist.includes(productId);
+  };
+
+  const clearWishlist = () => {
+    setWishlist([]);
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(
+        "wishlist"
+      );
+    }
+  };
+
+  // =========================
+  // PROVIDER
+  // =========================
 
   return (
     <CartContext.Provider
       value={{
+        // Cart
         cart,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+
+        // Wishlist
+        wishlist,
+        addToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        clearWishlist,
       }}
     >
       {children}
@@ -180,8 +288,13 @@ export function CartProvider({
   );
 }
 
+// =========================
+// HOOK
+// =========================
+
 export function useCart() {
-  const context = useContext(CartContext);
+  const context =
+    useContext(CartContext);
 
   if (!context) {
     throw new Error(
