@@ -36,7 +36,7 @@ export default function Footer() {
             <div className="mt-7 flex items-center gap-4">
 
               <a
-                href="#"
+                href="https://www.instagram.com/nepcloth"
                 aria-label="Instagram"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 transition-colors hover:bg-black hover:text-white"
               >
@@ -44,7 +44,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="#"
+                href="https://www.facebook.com/profile.php?id=61593421283031"
                 aria-label="Facebook"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 transition-colors hover:bg-black hover:text-white"
               >
@@ -52,7 +52,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:hello@nepcloth.com"
+                href="mailto:nishantkhadka566@gmail.com"
                 aria-label="Email"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 transition-colors hover:bg-black hover:text-white"
               >
