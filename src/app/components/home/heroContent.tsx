@@ -31,11 +31,11 @@ export default function HeroContent() {
           Everyday / Unordinary
         </p>
 
-        <h1 className="max-w-6xl text-[17vw] font-medium leading-[0.78] tracking-[-0.08em] text-black sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[12rem]">
-          WEAR
+        <h1 className="max-w-6xl text-[17vw] font-medium leading-[0.78] tracking-[-0.08em]  text-black sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[12rem]">
+          <span className="animate-pulse">WEAR</span>
           <br />
 
-          <span className="ml-[8vw]">YOUR</span>
+          <span className="ml-[8vw] ">YOUR</span>
           <br />
 
           <span className="text-black/30">OWN.</span>
@@ -52,7 +52,7 @@ export default function HeroContent() {
             href="/shop"
             className="group flex w-fit items-center gap-4 rounded-full bg-black px-7 py-4 text-sm font-medium text-white transition-all duration-300 hover:px-9"
           >
-            <span>Explore Collection</span>
+            <span className="animate-pulse" >Explore Collection</span>
 
             <span className="transition-transform duration-300 group-hover:translate-x-1">
               →
