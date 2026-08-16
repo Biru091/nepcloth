@@ -49,7 +49,7 @@ export default function HeroContent() {
           </p>
 
           <Link
-            href="/shop"
+            href="/products"
             className="group flex w-fit items-center gap-4 rounded-full bg-black px-7 py-4 text-sm font-medium text-white transition-all duration-300 hover:px-9"
           >
             <span className="animate-pulse" >Explore Collection</span>
