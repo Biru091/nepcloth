@@ -111,6 +111,9 @@ export default function Navbar() {
           <Link href="/cart" aria-label="Cart">
             <ShoppingBag size={20} strokeWidth={1.8} />
           </Link>
+           <Link href="/auth" aria-label="Cart">
+            <UserRoundKey size={20} strokeWidth={1.8} />
+          </Link>
 
           <button
             type="button"
