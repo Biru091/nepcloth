@@ -1,28 +1,32 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import productsData from "@/app/data/products.json";
 import { Product } from "@/app/types/products";
 
-interface SearchClientProps {
-  query: string;
+interface SearchPageProps {
+  searchParams: Promise<{
+    q?: string;
+  }>;
 }
 
-export default function SearchClient({
-  query,
-}: SearchClientProps) {
-  const router = useRouter();
+export default async function SearchPage({
+  searchParams,
+}: SearchPageProps) {
+  const params = await searchParams;
 
-  const [searchInput, setSearchInput] =
-    useState(query);
+  const query =
+    typeof params?.q === "string"
+      ? params.q
+      : "";
 
   const products =
     productsData.products as Product[];
+
+  // -----------------------------
+  // FILTER PRODUCTS
+  // -----------------------------
 
   const search = query
     .toLowerCase()
@@ -32,7 +36,7 @@ export default function SearchClient({
     ? products.filter((product) => {
         return (
           product.name
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(search) ||
           product.type
             ?.toLowerCase()
@@ -43,28 +47,6 @@ export default function SearchClient({
         );
       })
     : [];
-
-  const handleSearch = (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
-
-    const value = searchInput.trim();
-
-    if (!value) {
-      router.push("/search");
-      return;
-    }
-
-    router.push(
-      `/search?q=${encodeURIComponent(value)}`
-    );
-  };
-
-  const clearSearch = () => {
-    setSearchInput("");
-    router.push("/search");
-  };
 
   return (
     <main className="min-h-screen px-4 pb-20 pt-28 md:px-8">
@@ -78,10 +60,13 @@ export default function SearchClient({
           </h1>
 
           {/* SEARCH BAR */}
+
           <form
-            onSubmit={handleSearch}
+            action="/search"
+            method="GET"
             className="mt-8 flex items-center border-b border-black pb-3"
           >
+
             <Search
               size={20}
               strokeWidth={1.5}
@@ -90,19 +75,16 @@ export default function SearchClient({
 
             <input
               type="text"
-              value={searchInput}
-              onChange={(e) =>
-                setSearchInput(e.target.value)
-              }
+              name="q"
+              defaultValue={query}
               placeholder="Search products..."
               className="w-full bg-transparent text-lg outline-none placeholder:text-black/30"
               autoFocus
             />
 
-            {searchInput && (
-              <button
-                type="button"
-                onClick={clearSearch}
+            {query && (
+              <Link
+                href="/search"
                 className="ml-3 shrink-0"
                 aria-label="Clear search"
               >
@@ -110,25 +92,30 @@ export default function SearchClient({
                   size={18}
                   strokeWidth={1.5}
                 />
-              </button>
+              </Link>
             )}
-          </form>
 
+          </form>
         </div>
 
         {/* RESULTS */}
+
         <div className="mt-14">
 
           {/* NO QUERY */}
+
           {!query && (
             <div className="py-20 text-center">
+
               <p className="text-sm text-black/50">
                 Search for products
               </p>
+
             </div>
           )}
 
           {/* NO RESULTS */}
+
           {query &&
             filteredProducts.length === 0 && (
               <div className="py-20 text-center">
@@ -145,8 +132,11 @@ export default function SearchClient({
             )}
 
           {/* RESULTS */}
+
           {filteredProducts.length > 0 && (
             <>
+
+              {/* RESULT COUNT */}
 
               <div className="mb-8">
 
@@ -160,6 +150,8 @@ export default function SearchClient({
 
               </div>
 
+              {/* PRODUCT GRID */}
+
               <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
 
                 {filteredProducts.map(
@@ -171,6 +163,7 @@ export default function SearchClient({
                     >
 
                       {/* IMAGE */}
+
                       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
 
                         <Image
@@ -181,6 +174,8 @@ export default function SearchClient({
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
 
+                        {/* NEW BADGE */}
+
                         {product.newArrival && (
                           <span className="absolute left-3 top-3 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-wider">
                             New
@@ -189,7 +184,8 @@ export default function SearchClient({
 
                       </div>
 
-                      {/* INFO */}
+                      {/* PRODUCT INFO */}
+
                       <div className="px-1 pt-4">
 
                         <div className="flex items-start justify-between gap-3">
@@ -227,7 +223,6 @@ export default function SearchClient({
           )}
 
         </div>
-
       </div>
     </main>
   );
