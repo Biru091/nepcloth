@@ -1,229 +1,205 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
 
-import productsData from "@/app/data/products.json";
+import ProductCard from "@/app/components/ProductCard/ProductCard";
 import { Product } from "@/app/types/products";
 
-interface SearchPageProps {
-  searchParams: Promise<{
-    q?: string;
-  }>;
-}
+export default function SearchPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-export default async function SearchPage({
-  searchParams,
-}: SearchPageProps) {
-  const params = await searchParams;
+  // =====================================================
+  // FETCH PRODUCTS
+  // =====================================================
 
-  const query =
-    typeof params?.q === "string"
-      ? params.q
-      : "";
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch("/api/products");
 
-  const products =
-    productsData.products as Product[];
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
 
-  // -----------------------------
-  // FILTER PRODUCTS
-  // -----------------------------
+        const data = await response.json();
 
-  const search = query
-    .toLowerCase()
-    .trim();
+        const productList = Array.isArray(data)
+          ? data
+          : data.products || [];
 
-  const filteredProducts = search
-    ? products.filter((product) => {
-        return (
-          product.name
-            ?.toLowerCase()
-            .includes(search) ||
-          product.type
-            ?.toLowerCase()
-            .includes(search) ||
-          product.slug
-            ?.toLowerCase()
-            .includes(search)
-        );
-      })
-    : [];
+        setProducts(productList);
+      } catch (error) {
+        console.error("FETCH PRODUCTS ERROR:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  const filteredProducts = products.filter((product) => {
+    const query = search.toLowerCase().trim();
+
+    if (!query) {
+      return false;
+    }
+
+    return (
+      product.name?.toLowerCase().includes(query) ||
+      product.slug?.toLowerCase().includes(query) ||
+      product.type?.toLowerCase().includes(query) ||
+      product.print?.toLowerCase().includes(query) ||
+      product.printCoverage?.toLowerCase().includes(query)
+    );
+  });
+
+  // =====================================================
+  // CLEAR SEARCH
+  // =====================================================
+
+  function clearSearch() {
+    setSearch("");
+  }
+
+  // =====================================================
+  // UI
+  // =====================================================
 
   return (
-    <main className="min-h-screen px-4 pb-20 pt-28 md:px-8">
+    <main className="min-h-screen bg-white px-5 pb-20 pt-28 md:px-10 lg:px-16">
+
       <div className="mx-auto max-w-7xl">
 
-        {/* HEADER */}
-        <div className="mx-auto max-w-3xl">
+        {/* ================= HEADER ================= */}
 
-          <h1 className="text-3xl font-medium tracking-tight md:text-5xl">
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
             Search
           </h1>
 
-          {/* SEARCH BAR */}
+          <p className="mt-2 text-sm text-black/50">
+            Find the perfect product for you.
+          </p>
+        </div>
 
-          <form
-            action="/search"
-            method="GET"
-            className="mt-8 flex items-center border-b border-black pb-3"
-          >
+        {/* ================= SEARCH INPUT ================= */}
+
+        <div className="mx-auto flex max-w-2xl items-center border-b border-black/20 pb-3">
+
+          <Search
+            size={20}
+            strokeWidth={1.5}
+            className="mr-3 shrink-0 text-black/40"
+          />
+
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search for t-shirts, printed, plain..."
+            autoFocus
+            className="w-full bg-transparent text-base outline-none placeholder:text-black/30"
+          />
+
+          {search && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="ml-3 shrink-0 text-black/40 transition hover:text-black"
+              aria-label="Clear search"
+            >
+              <X size={18} />
+            </button>
+          )}
+
+        </div>
+
+        {/* ================= LOADING ================= */}
+
+        {loading && (
+          <div className="py-24 text-center">
+            <p className="text-sm text-black/40">
+              Loading products...
+            </p>
+          </div>
+        )}
+
+        {/* ================= RESULTS ================= */}
+
+        {!loading && search && (
+          <>
+            <div className="mt-10 mb-6">
+              <p className="text-sm text-black/50">
+                {filteredProducts.length}{" "}
+                {filteredProducts.length === 1
+                  ? "product"
+                  : "products"}{" "}
+                found for{" "}
+                <span className="font-medium text-black">
+                  `&ldquo;`{search}`&rdquo;`
+                </span>
+              </p>
+            </div>
+
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="py-24 text-center">
+
+                <Search
+                  size={32}
+                  strokeWidth={1.2}
+                  className="mx-auto mb-4 text-black/20"
+                />
+
+                <h2 className="text-lg font-medium">
+                  No products found
+                </h2>
+
+                <p className="mt-2 text-sm text-black/40">
+                  Try searching for another product.
+                </p>
+
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ================= BEFORE SEARCH ================= */}
+
+        {!loading && !search && (
+          <div className="py-24 text-center">
 
             <Search
-              size={20}
-              strokeWidth={1.5}
-              className="mr-3 shrink-0"
+              size={32}
+              strokeWidth={1.2}
+              className="mx-auto mb-4 text-black/20"
             />
 
-            <input
-              type="text"
-              name="q"
-              defaultValue={query}
-              placeholder="Search products..."
-              className="w-full bg-transparent text-lg outline-none placeholder:text-black/30"
-              autoFocus
-            />
+            <p className="text-sm text-black/40">
+              Start typing to search products.
+            </p>
 
-            {query && (
-              <Link
-                href="/search"
-                className="ml-3 shrink-0"
-                aria-label="Clear search"
-              >
-                <X
-                  size={18}
-                  strokeWidth={1.5}
-                />
-              </Link>
-            )}
+          </div>
+        )}
 
-          </form>
-        </div>
-
-        {/* RESULTS */}
-
-        <div className="mt-14">
-
-          {/* NO QUERY */}
-
-          {!query && (
-            <div className="py-20 text-center">
-
-              <p className="text-sm text-black/50">
-                Search for products
-              </p>
-
-            </div>
-          )}
-
-          {/* NO RESULTS */}
-
-          {query &&
-            filteredProducts.length === 0 && (
-              <div className="py-20 text-center">
-
-                <p className="text-lg">
-                  No products found
-                </p>
-
-                <p className="mt-2 text-sm text-black/50">
-                  Try searching for something else.
-                </p>
-
-              </div>
-            )}
-
-          {/* RESULTS */}
-
-          {filteredProducts.length > 0 && (
-            <>
-
-              {/* RESULT COUNT */}
-
-              <div className="mb-8">
-
-                <p className="text-sm text-black/50">
-                  {filteredProducts.length}{" "}
-                  {filteredProducts.length === 1
-                    ? "result"
-                    : "results"}{" "}
-                  for &quot;{query}&quot;
-                </p>
-
-              </div>
-
-              {/* PRODUCT GRID */}
-
-              <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-
-                {filteredProducts.map(
-                  (product) => (
-                    <Link
-                      key={product.id}
-                      href={`/products/${product.slug}`}
-                      className="group"
-                    >
-
-                      {/* IMAGE */}
-
-                      <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
-
-                        <Image
-                          src="/tshirt/tshirt.webp"
-                          alt={product.name}
-                          fill
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-
-                        {/* NEW BADGE */}
-
-                        {product.newArrival && (
-                          <span className="absolute left-3 top-3 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-wider">
-                            New
-                          </span>
-                        )}
-
-                      </div>
-
-                      {/* PRODUCT INFO */}
-
-                      <div className="px-1 pt-4">
-
-                        <div className="flex items-start justify-between gap-3">
-
-                          <div>
-
-                            <h2 className="text-sm font-medium tracking-tight">
-                              {product.name}
-                            </h2>
-
-                            <p className="mt-1 text-xs capitalize text-black/50">
-                              {product.type ===
-                              "printed"
-                                ? `${product.printCoverage} print`
-                                : "Plain"}
-                            </p>
-
-                          </div>
-
-                          <p className="shrink-0 text-sm font-medium">
-                            Rs. {product.price}
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    </Link>
-                  )
-                )}
-
-              </div>
-
-            </>
-          )}
-
-        </div>
       </div>
     </main>
   );
 }
+

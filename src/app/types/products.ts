@@ -1,7 +1,13 @@
+export interface ProductImage {
+  data: string;
+  contentType: string;
+}
 
 export interface Product {
   id: string;
+
   name: string;
+
   slug: string;
 
   type: "printed" | "plain";
@@ -15,4 +21,8 @@ export interface Product {
   trending: boolean;
 
   newArrival: boolean;
+
+  frontImage: ProductImage | null;
+
+  backImage: ProductImage | null;
 }

@@ -1,75 +1,214 @@
-import productsData from "@/app/data/products.json"
+
+"use client";
+
+import { useEffect, useState } from "react";
+
 import ProductCard from "@/app/components/ProductCard/ProductCard";
+
 import { Product } from "@/app/types/products";
 
 export default function NewArrivalsPage() {
-  const products: Product[] =
-    productsData.products as Product[];
+  // =====================================================
+  // STATE
+  // =====================================================
 
-  const newArrivalProducts = products.filter(
-    (product) => product.newArrival
-  );
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+  // =====================================================
+  // LOAD PRODUCTS
+  // =====================================================
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        // =================================================
+        // FETCH FROM SAME API
+        // =================================================
+
+        const response = await fetch("/api/products");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        // =================================================
+        // GET RESPONSE DATA
+        // =================================================
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "Failed to fetch products"
+          );
+        }
+
+        // =================================================
+        // SET PRODUCTS
+        // =================================================
+
+        setProducts(data.products);
+
+      } catch (error) {
+
+        console.error(
+          "NEW ARRIVALS LOAD ERROR:",
+          error
+        );
+
+        setError("Unable to load products.");
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  // =====================================================
+  // FILTER NEW ARRIVALS
+  // =====================================================
+
+ const newArrivalProducts = products
+  .filter((product) => product.newArrival === true)
+ 
+
+  // =====================================================
+  // RETURN
+  // =====================================================
 
   return (
     <main className="min-h-screen bg-white px-4 pb-20 pt-28 md:px-6 md:pt-32">
 
-      {/* Header */}
-      <div className="mx-auto mb-12 max-w-7xl">
+      <div className="mx-auto max-w-7xl">
 
-        <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.3em] text-black/40">
-          Latest Drop
-        </p>
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="mb-12">
+
+          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.3em] text-black/40">
+            Latest Drop
+          </p>
 
           <h1 className="text-4xl font-medium tracking-tight md:text-5xl lg:text-6xl">
             New Arrivals
           </h1>
 
-          <p className="max-w-sm text-sm leading-6 text-black/50">
+          <p className="mt-4 max-w-md text-sm leading-6 text-black/50">
             Explore our latest pieces, fresh designs, and new
             additions to the collection.
           </p>
 
         </div>
 
-      </div>
+        {/* =================================================
+            TOP BAR
+        ================================================= */}
 
-      {/* Product count */}
-      <div className="mx-auto mb-6 flex max-w-7xl items-center justify-between border-b border-black/10 pb-4">
+        <div className="mb-8 flex items-center justify-between border-y border-black/10 py-4">
 
-        <p className="text-xs text-black/50">
-          {newArrivalProducts.length} Products
-        </p>
+          <p className="text-xs text-black/50">
 
-        <button
-          type="button"
-          className="text-xs font-medium uppercase tracking-wider"
-        >
-          Filter & Sort
-        </button>
+            {loading
+              ? "Loading..."
+              : `${newArrivalProducts.length} Products`}
 
-      </div>
-
-      {/* Products */}
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {newArrivalProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-          />
-        ))}
-      </div>
-
-      {/* Empty state */}
-      {newArrivalProducts.length === 0 && (
-        <div className="flex min-h-[300px] items-center justify-center">
-          <p className="text-sm text-black/50">
-            No new arrivals available.
           </p>
+
+          <button
+            type="button"
+            className="text-xs font-medium uppercase tracking-wider"
+          >
+            Filter & Sort
+          </button>
+
         </div>
-      )}
+
+        {/* =================================================
+            LOADING
+        ================================================= */}
+
+        {loading && (
+
+          <div className="py-20 text-center">
+
+            <p className="text-sm text-black/50">
+              Loading products...
+            </p>
+
+          </div>
+
+        )}
+
+        {/* =================================================
+            ERROR
+        ================================================= */}
+
+        {!loading && error && (
+
+          <div className="py-20 text-center">
+
+            <p className="text-sm text-red-500">
+              {error}
+            </p>
+
+          </div>
+
+        )}
+
+        {/* =================================================
+            EMPTY
+        ================================================= */}
+
+        {!loading &&
+          !error &&
+          newArrivalProducts.length === 0 && (
+
+            <div className="py-20 text-center">
+
+              <p className="text-sm text-black/50">
+                No new arrivals available.
+              </p>
+
+            </div>
+
+          )}
+
+        {/* =================================================
+            NEW ARRIVAL PRODUCTS
+        ================================================= */}
+
+        {!loading &&
+          !error &&
+          newArrivalProducts.length > 0 && (
+
+            <div className="grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+
+              {newArrivalProducts.map((product) => (
+
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                />
+
+              ))}
+
+            </div>
+
+          )}
+
+      </div>
 
     </main>
   );
 }
+

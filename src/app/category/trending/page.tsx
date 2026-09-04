@@ -1,10 +1,22 @@
-import productsData from "@/app/data/products.json"
 import ProductCard from "@/app/components/ProductCard/ProductCard";
 import { Product } from "@/app/types/products";
 
-export default function TrendingPage() {
-  const products: Product[] =
-    productsData.products as Product[];
+async function getProducts(): Promise<Product[]> {
+  const response = await fetch("http://localhost:3000/api/products", {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  const data = await response.json();
+
+  return Array.isArray(data) ? data : data.products || [];
+}
+
+export default async function TrendingPage() {
+  const products = await getProducts();
 
   const trendingProducts = products.filter(
     (product) => product.trending
@@ -12,7 +24,6 @@ export default function TrendingPage() {
 
   return (
     <main className="min-h-screen bg-white px-4 pb-20 pt-28 md:px-6 md:pt-32">
-
       <div className="mx-auto max-w-7xl">
 
         {/* Header */}
@@ -33,7 +44,6 @@ export default function TrendingPage() {
 
         {/* Top bar */}
         <div className="mb-8 flex items-center justify-between border-y border-black/10 py-4">
-
           <p className="text-xs text-black/50">
             {trendingProducts.length} Products
           </p>
@@ -44,7 +54,6 @@ export default function TrendingPage() {
           >
             Filter & Sort
           </button>
-
         </div>
 
         {/* Products */}
@@ -64,9 +73,7 @@ export default function TrendingPage() {
             </p>
           </div>
         )}
-
       </div>
-
     </main>
   );
 }

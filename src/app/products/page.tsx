@@ -1,14 +1,45 @@
-import productsData from "@/app/data/products.json"
+"use client";
+
+import { useEffect, useState } from "react";
 import ProductCard from "@/app/components/ProductCard/ProductCard";
 import { Product } from "@/app/types/products";
 
 export default function ProductsPage() {
-  const products: Product[] =
-    productsData.products as Product[];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "Failed to fetch products"
+          );
+        }
+
+        setProducts(data.products);
+      } catch (error) {
+        console.error("PRODUCT LOAD ERROR:", error);
+        setError("Unable to load products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   return (
     <main className="min-h-screen bg-white px-4 pb-20 pt-28 md:px-6 md:pt-32">
-
       <div className="mx-auto max-w-7xl">
 
         {/* Header */}
@@ -29,9 +60,8 @@ export default function ProductsPage() {
 
         {/* Top bar */}
         <div className="mb-8 flex items-center justify-between border-y border-black/10 py-4">
-
           <p className="text-xs text-black/50">
-            {products.length} Products
+            {loading ? "Loading..." : `${products.length} Products`}
           </p>
 
           <button
@@ -40,21 +70,48 @@ export default function ProductsPage() {
           >
             Filter & Sort
           </button>
-
         </div>
+
+        {/* Loading */}
+        {loading && (
+          <div className="py-20 text-center">
+            <p className="text-sm text-black/50">
+              Loading products...
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
+        {!loading && error && (
+          <div className="py-20 text-center">
+            <p className="text-sm text-red-500">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {/* Empty */}
+        {!loading && !error && products.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="text-sm text-black/50">
+              No products available.
+            </p>
+          </div>
+        )}
 
         {/* Products */}
-        <div className="grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
-        </div>
+        {!loading && !error && products.length > 0 && (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+        )}
 
       </div>
-
     </main>
   );
 }
