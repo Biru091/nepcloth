@@ -1,10 +1,10 @@
-
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import ProductCard from "../../ProductCard/ProductCard";
+
 import { Product } from "@/app/types/products";
 
 export default function Trending() {
@@ -15,11 +15,21 @@ export default function Trending() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch("/api/products");
+        // =================================================
+        // FETCH ONLY TRENDING PRODUCTS
+        // =================================================
+
+        const response = await fetch(
+          "/api/products?trending=true"
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
+
+        // =================================================
+        // GET RESPONSE DATA
+        // =================================================
 
         const data = await response.json();
 
@@ -29,9 +39,14 @@ export default function Trending() {
           );
         }
 
+        // =================================================
+        // SAVE PRODUCTS
+        // =================================================
+
         setProducts(data.products);
       } catch (error) {
         console.error("TRENDING LOAD ERROR:", error);
+
         setError("Unable to load trending products.");
       } finally {
         setLoading(false);
@@ -41,12 +56,17 @@ export default function Trending() {
     loadProducts();
   }, []);
 
-  const trendingProducts = products
-    .filter((product) => product.trending === true)
-    .slice(0, 6);
+  // API already returns only trending products.
+  // Homepage displays maximum 6.
+  const trendingProducts = products.slice(0, 6);
 
   return (
     <section className="w-full px-4 py-10 md:px-6 lg:py-2">
+
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <div className="mb-10 flex items-end justify-between">
         <div>
           <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.3em] text-black/40">
@@ -70,7 +90,10 @@ export default function Trending() {
         </Link>
       </div>
 
-      {/* Loading */}
+      {/* =================================================
+          LOADING
+      ================================================= */}
+
       {loading && (
         <div className="py-20 text-center">
           <p className="text-sm text-black/50">
@@ -79,7 +102,10 @@ export default function Trending() {
         </div>
       )}
 
-      {/* Error */}
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
       {!loading && error && (
         <div className="py-20 text-center">
           <p className="text-sm text-red-500">
@@ -88,19 +114,41 @@ export default function Trending() {
         </div>
       )}
 
-      {/* Products */}
-      {!loading && !error && (
-        <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {trendingProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
-        </div>
-      )}
+      {/* =================================================
+          PRODUCTS
+      ================================================= */}
 
-      {/* Mobile View */}
+      {!loading &&
+        !error &&
+        trendingProducts.length > 0 && (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {trendingProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+        )}
+
+      {/* =================================================
+          EMPTY
+      ================================================= */}
+
+      {!loading &&
+        !error &&
+        trendingProducts.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="text-sm text-black/50">
+              No trending products available.
+            </p>
+          </div>
+        )}
+
+      {/* =================================================
+          MOBILE VIEW
+      ================================================= */}
+
       <div className="mt-10 flex justify-center md:hidden">
         <Link
           href="/category/trending"
@@ -112,4 +160,3 @@ export default function Trending() {
     </section>
   );
 }
-

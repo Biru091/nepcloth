@@ -1,100 +1,19 @@
-
-"use client";
-
-import { useEffect, useState } from "react";
-
 import ProductCard from "@/app/components/ProductCard/ProductCard";
-
+import { getNewArrivalProducts } from "@/app/libs/products";
 import { Product } from "@/app/types/products";
 
-export default function NewArrivalsPage() {
-  // =====================================================
-  // STATE
-  // =====================================================
+export default async function NewArrivalsPage() {
+  const products = await getNewArrivalProducts();
 
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
-
-  // =====================================================
-  // LOAD PRODUCTS
-  // =====================================================
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        // =================================================
-        // FETCH FROM SAME API
-        // =================================================
-
-        const response = await fetch("/api/products");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-
-        // =================================================
-        // GET RESPONSE DATA
-        // =================================================
-
-        const data = await response.json();
-
-        if (!data.success) {
-          throw new Error(
-            data.message || "Failed to fetch products"
-          );
-        }
-
-        // =================================================
-        // SET PRODUCTS
-        // =================================================
-
-        setProducts(data.products);
-
-      } catch (error) {
-
-        console.error(
-          "NEW ARRIVALS LOAD ERROR:",
-          error
-        );
-
-        setError("Unable to load products.");
-
-      } finally {
-
-        setLoading(false);
-
-      }
-    };
-
-    loadProducts();
-  }, []);
-
-  // =====================================================
-  // FILTER NEW ARRIVALS
-  // =====================================================
-
- const newArrivalProducts = products
-  .filter((product) => product.newArrival === true)
- 
-
-  // =====================================================
-  // RETURN
-  // =====================================================
+  const newArrivalProducts = products as unknown as Product[];
 
   return (
     <main className="min-h-screen bg-white px-4 pb-20 pt-28 md:px-6 md:pt-32">
-
       <div className="mx-auto max-w-7xl">
 
-        {/* =================================================
-            HEADER
-        ================================================= */}
+        {/* HEADER */}
 
         <div className="mb-12">
-
           <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.3em] text-black/40">
             Latest Drop
           </p>
@@ -107,21 +26,13 @@ export default function NewArrivalsPage() {
             Explore our latest pieces, fresh designs, and new
             additions to the collection.
           </p>
-
         </div>
 
-        {/* =================================================
-            TOP BAR
-        ================================================= */}
+        {/* TOP BAR */}
 
         <div className="mb-8 flex items-center justify-between border-y border-black/10 py-4">
-
           <p className="text-xs text-black/50">
-
-            {loading
-              ? "Loading..."
-              : `${newArrivalProducts.length} Products`}
-
+            {newArrivalProducts.length} Products
           </p>
 
           <button
@@ -130,85 +41,27 @@ export default function NewArrivalsPage() {
           >
             Filter & Sort
           </button>
-
         </div>
 
-        {/* =================================================
-            LOADING
-        ================================================= */}
+        {/* PRODUCTS */}
 
-        {loading && (
-
-          <div className="py-20 text-center">
-
+        {newArrivalProducts.length > 0 ? (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {newArrivalProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex min-h-[300px] items-center justify-center">
             <p className="text-sm text-black/50">
-              Loading products...
+              No new arrivals available.
             </p>
-
           </div>
-
         )}
-
-        {/* =================================================
-            ERROR
-        ================================================= */}
-
-        {!loading && error && (
-
-          <div className="py-20 text-center">
-
-            <p className="text-sm text-red-500">
-              {error}
-            </p>
-
-          </div>
-
-        )}
-
-        {/* =================================================
-            EMPTY
-        ================================================= */}
-
-        {!loading &&
-          !error &&
-          newArrivalProducts.length === 0 && (
-
-            <div className="py-20 text-center">
-
-              <p className="text-sm text-black/50">
-                No new arrivals available.
-              </p>
-
-            </div>
-
-          )}
-
-        {/* =================================================
-            NEW ARRIVAL PRODUCTS
-        ================================================= */}
-
-        {!loading &&
-          !error &&
-          newArrivalProducts.length > 0 && (
-
-            <div className="grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-
-              {newArrivalProducts.map((product) => (
-
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                />
-
-              ))}
-
-            </div>
-
-          )}
-
       </div>
-
     </main>
   );
 }
-

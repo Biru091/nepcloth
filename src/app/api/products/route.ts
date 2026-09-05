@@ -24,12 +24,38 @@ export async function OPTIONS() {
 // GET PRODUCTS
 // -----------------------------
 
-export async function GET() {
+
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const products = await Product.find()
+    const { searchParams } = new URL(request.url);
+
+    const trending = searchParams.get("trending");
+    const newArrival = searchParams.get("newArrival");
+    const limitParam = searchParams.get("limit");
+
+    const limit = Math.min(
+      Math.max(Number(limitParam) || 50, 1),
+      100
+    );
+
+    const filter: Record<string, boolean> = {};
+
+    if (trending === "true") {
+      filter.trending = true;
+    }
+
+    if (newArrival === "true") {
+      filter.newArrival = true;
+    }
+
+    const products = await Product.find(filter)
+      .select(
+        "id name slug type print printCoverage price trending newArrival frontImage"
+      )
       .sort({ createdAt: -1 })
+      .limit(limit)
       .lean();
 
     return NextResponse.json(
@@ -39,7 +65,11 @@ export async function GET() {
       },
       {
         status: 200,
-        headers: corsHeaders,
+        headers: {
+          ...corsHeaders,
+          "Cache-Control":
+            "public, s-maxage=60, stale-while-revalidate=300",
+        },
       }
     );
   } catch (error) {
@@ -57,6 +87,10 @@ export async function GET() {
     );
   }
 }
+
+
+
+
 
 // -----------------------------
 // POST PRODUCT
