@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HeroContent() {
   return (
-    <div className="relative flex min-h-[calc(100svh-64px)] flex-col justify-between overflow-hidden bg-[#f4f3ef] px-6 py-8 sm:px-10 lg:px-16 lg:py-10">
+    <div className="relative flex min-h-[calc(100svh-30px)] flex-col justify-between overflow-hidden bg-[#f4f3ef] px-6 py-9 sm:px-10 lg:px-16 lg:py-9">
 
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 opacity-60">
@@ -14,7 +14,7 @@ export default function HeroContent() {
       </div>
 
       {/* Top */}
-      <div className="relative z-10 flex items-center justify-between">
+      <div className="relative z-10 flex items-center justify-between pt-15">
         <p className="text-xs font-medium uppercase tracking-[0.3em]">
           NEPCLOTH
         </p>
